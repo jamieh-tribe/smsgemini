@@ -2,5 +2,4 @@ flask
 twilio
 google-genai>=0.3.0
 gunicorn
-flask-sqlalchemy
-psycopg2-binary
+google-cloud-firestore
