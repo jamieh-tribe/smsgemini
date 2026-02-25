@@ -7,22 +7,23 @@ from google.genai import types
 app = Flask(__name__)
 
 # Initialize the Gemini Client
-# Ensure GEMINI_API_KEY is set in Render Environment Variables
+# Uses the API Key you provided in Render's Environment Variables
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/", methods=['GET'])
 def health_check():
-    """Verify the server is online via browser"""
+    """Simple route to verify the server is reachable via browser"""
     return "Gemini 3 SMS Bot is Online!", 200
 
 @app.route("/sms", methods=['POST'])
 def reply_to_sms():
-    """Handles incoming SMS from Twilio"""
+    """Triggered when a text is sent to your Twilio number"""
     user_message = request.form.get('Body')
-    print(f"Received SMS: {user_message}")
+    print(f"Incoming SMS: {user_message}")
 
     try:
-        # Using Gemini 3 Flash for real-time web search
+        # Using the flagship Gemini 3 Flash model
+        # Previous 2.0 models were discontinued for new projects on Feb 17, 2026
         response = client.models.generate_content(
             model="models/gemini-3-flash",
             contents=user_message,
@@ -33,16 +34,17 @@ def reply_to_sms():
         )
         reply_text = response.text
     except Exception as e:
-        # Prints specific error to Render logs for debugging
+        # Logs the specific API or Logic error to Render Logs
         print(f"REAL ERROR: {e}") 
-        reply_text = "I'm connected, but Gemini had an issue. Checking logs!"
+        reply_text = "I'm online, but Gemini had an issue with that request. Checking my logs!"
 
-    # Create the Twilio Response
+    # Wrap the response in TwiML for Twilio to deliver
     twiml = MessagingResponse()
     twiml.message(reply_text)
     return str(twiml)
 
 if __name__ == "__main__":
-    # Render Starter tier provides the PORT variable; we default to 10000
+    # Dynamically binds to the port provided by Render
+    # This prevents the 'No open HTTP ports detected' error
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
