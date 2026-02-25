@@ -22,7 +22,7 @@ def reply_to_sms():
         # Ask Gemini 2.0 Flash
         # We use a simplified config to ensure stability
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.0-flash-001",
             contents=user_message,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
