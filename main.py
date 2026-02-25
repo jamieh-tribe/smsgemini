@@ -16,30 +16,29 @@ def health_check():
 @app.route("/sms", methods=['POST'])
 def reply_to_sms():
     user_message = request.form.get('Body')
-    print(f"Received: {user_message}") # This will show in Render Logs
+    print(f"Received SMS: {user_message}")
 
     try:
-        # Ask Gemini 2.0 Flash with Google Search
+        # Ask Gemini 2.0 Flash
+        # We use a simplified config to ensure stability
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=user_message,
             config=types.GenerateContentConfig(
-                system_instruction="You are a concise SMS assistant. Use Google Search for real-time info. Keep answers under 300 characters.",
-                tools=[types.Tool(google_search=types.GoogleSearch())]
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                system_instruction="You are a helpful assistant. Keep answers under 300 characters."
             )
         )
         reply_text = response.text
     except Exception as e:
-        print(f"Gemini Error: {e}")
-        reply_text = "Sorry, I'm having trouble thinking right now. Try again?"
+        # This print line is KEY. It will show the real error in Render Logs.
+        print(f"REAL ERROR: {e}") 
+        reply_text = "I'm connected, but Gemini gave an error. Check logs."
 
-    # Send the response back to Twilio
     twiml = MessagingResponse()
     twiml.message(reply_text)
     return str(twiml)
 
 if __name__ == "__main__":
-    # Render provides the PORT environment variable. 
-    # If it's not there, we default to 10000.
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
