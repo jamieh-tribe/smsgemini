@@ -30,7 +30,7 @@ client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/", methods=['GET'])
 def health_check():
-    return "Friendly Gemini 3 Bot is Online!", 200
+    return "Friendly Gemini 2.5 Bot is Online!", 200
 
 @app.route("/sms", methods=['POST'])
 def reply_to_sms():
@@ -38,21 +38,20 @@ def reply_to_sms():
     user_text = request.form.get('Body')
 
     try:
-        # Retrieve recent history for context
+        # Retrieve recent history
         past_chats = ChatHistory.query.filter_by(phone_number=user_phone).order_by(ChatHistory.id.desc()).limit(4).all()
         history_context = "\n".join([f"{c.role}: {c.message}" for c in reversed(past_chats)])
 
-        # Generate response with friendly instructions
+        # Using the stable 2.5 Flash model
         response = client.models.generate_content(
-            model="models/gemini-3-flash",
+            model="gemini-2.5-flash",
             contents=f"History:\n{history_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
                 system_instruction=(
-                    "You are a warm and friendly personal assistant. "
-                    "You are based in Australia, so always use Celsius for temperature and metric units (km, kg) for measurements. "
-                    "Use the provided conversation history to remember the user's details and name. "
-                    "Be helpful, kind, and keep your responses concise (under 300 characters)."
+                    "You are a warm and friendly personal assistant based in Australia. "
+                    "Always use Celsius for temperature and metric units (km, kg). "
+                    "Use history to remember user details. Keep responses under 300 characters."
                 )
             )
         )
@@ -64,16 +63,14 @@ def reply_to_sms():
         db.session.commit()
 
     except Exception as e:
-        print(f"Error: {e}")
-        reply_text = "I'm so sorry, I'm having a little trouble connecting right now. Could you try again in a moment?"
+        print(f"ERROR: {e}")
+        reply_text = "I'm so sorry, I'm having an issue. Could you try again in a moment?"
 
     twiml = MessagingResponse()
     twiml.message(reply_text)
     return str(twiml)
 
 if __name__ == "__main__":
-    # Render provides the port in the environment; 
-    # we use 5000 as a fallback only for local testing.
+    # Dynamically bind to the port Render provides
     port = int(os.environ.get("PORT", 5000))
-    # host MUST be 0.0.0.0 to be visible to Render's network
     app.run(host='0.0.0.0', port=port)
