@@ -24,7 +24,7 @@ def reply_to_sms():
     try:
         # Using Gemini 3 Flash for real-time web search
         response = client.models.generate_content(
-            model="gemini-3-flash",
+            model="models/gemini-3-flash",
             contents=user_message,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
