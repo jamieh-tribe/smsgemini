@@ -16,7 +16,7 @@ def reply_to_sms():
     
     # 2. Tell Gemini to search the web and be brief (SMS is short!)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-1.5-flash",
         contents=user_message,
         config=types.GenerateContentConfig(
             system_instruction="You are a helpful SMS assistant. Keep answers under 300 characters.",
