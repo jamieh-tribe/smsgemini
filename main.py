@@ -7,7 +7,8 @@ from google.cloud import firestore
 
 app = Flask(__name__)
 
-# Initialize Firestore (Make sure your Google credentials are set)
+# Initialize Firestore
+# It will automatically find the JSON file via GOOGLE_APPLICATION_CREDENTIALS
 db = firestore.Client()
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
@@ -17,7 +18,7 @@ def reply_to_sms():
     user_text = request.form.get('Body')
 
     try:
-        # 1. Get history from Firestore
+        # 1. Get history from Firestore (FREE)
         history_ref = db.collection("chats").document(user_phone).collection("messages")
         docs = history_ref.order_by("timestamp", direction=firestore.Query.DESCENDING).limit(4).stream()
         
@@ -32,18 +33,29 @@ def reply_to_sms():
             contents=f"History:\n{history_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                system_instruction="Warm, friendly assistant in Australia. Keep language generic and warm. Use Celsius/metric. Remember user details."
+                system_instruction=(
+                    "You are a warm, friendly assistant in Australia. Use Celsius/metric. "
+                    "Only greet by name occasionally. Vary your greetings."
+                )
             )
         )
         reply_text = response.text
 
         # 3. Save to Firestore
-        history_ref.add({"role": "user", "content": user_text, "timestamp": firestore.SERVER_TIMESTAMP})
-        history_ref.add({"role": "model", "content": reply_text, "timestamp": firestore.SERVER_TIMESTAMP})
+        history_ref.add({
+            "role": "user", 
+            "content": user_text, 
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
+        history_ref.add({
+            "role": "model", 
+            "content": reply_text, 
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
 
     except Exception as e:
         print(f"Error: {e}")
-        reply_text = "Sorry, I hit a snag. Try again?"
+        reply_text = "Sorry, I had a little trouble with my memory. Try again?"
 
     twiml = MessagingResponse()
     twiml.message(reply_text)
