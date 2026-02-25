@@ -19,8 +19,7 @@ def reply_to_sms():
     print(f"Received SMS: {user_message}")
 
     try:
-        # Ask Gemini 2.0 Flash
-        # We use a simplified config to ensure stability
+        # Using the specific versioned model name
         response = client.models.generate_content(
             model="gemini-2.0-flash-001",
             contents=user_message,
@@ -31,14 +30,13 @@ def reply_to_sms():
         )
         reply_text = response.text
     except Exception as e:
-        # This print line is KEY. It will show the real error in Render Logs.
         print(f"REAL ERROR: {e}") 
-        reply_text = "I'm connected, but Gemini gave an error. Check logs."
+        reply_text = "I'm connected, but Gemini had an issue. Checking logs!"
 
     twiml = MessagingResponse()
     twiml.message(reply_text)
     return str(twiml)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    # Forcing port 10000 for Render Starter Tier
+    app.run(host='0.0.0.0', port=10000)
