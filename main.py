@@ -39,5 +39,7 @@ def reply_to_sms():
     return str(twiml)
 
 if __name__ == "__main__":
-    # Starter tier uses port 10000 by default
-    app.run(host='0.0.0.0', port=10000)
+    # Render provides the PORT environment variable. 
+    # If it's not there, we default to 10000.
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
