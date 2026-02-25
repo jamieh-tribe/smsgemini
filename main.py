@@ -1,41 +1,49 @@
 import os
+import threading
 from flask import Flask, request
-from twilio.twiml.messaging_response import MessagingResponse
+from twilio.rest import Client as TwilioClient
 from google import genai
 from google.genai import types
 
 app = Flask(__name__)
 
-# Initialize the Gemini Client using your API Key from Render's Environment Variables
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# Initialize Clients
+gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+twilio_client = TwilioClient(os.environ.get("TWILIO_ACCOUNT_SID"), os.environ.get("TWILIO_AUTH_TOKEN"))
 
-@app.route("/sms", methods=['POST'])
-def reply_to_sms():
-    # 1. Get the text message sent to the Twilio number
-    user_message = request.form.get('Body')
-    
+def ask_gemini_and_send_sms(user_message, to_number):
     try:
-        # 2. Ask Gemini 2.0 Flash to respond using Google Search
-        response = client.models.generate_content(
+        # 1. Get answer from Gemini
+        response = gemini_client.models.generate_content(
             model="gemini-2.0-flash",
             contents=user_message,
             config=types.GenerateContentConfig(
-                system_instruction="You are a concise SMS assistant. Use Google Search for real-time info. Keep answers under 320 characters.",
+                system_instruction="Concise SMS assistant. Use Google Search. Max 300 chars.",
                 tools=[types.Tool(google_search=types.GoogleSearch())]
             )
         )
-        reply_text = response.text
-
+        
+        # 2. Send the response as a NEW text message
+        twilio_client.messages.create(
+            body=response.text,
+            from_=os.environ.get("TWILIO_NUMBER"),
+            to=to_number
+        )
     except Exception as e:
-        # If something goes wrong (like a temporary API hiccup)
-        print(f"Error: {e}")
-        reply_text = "Sorry, I encountered an error. Please try again in a moment."
+        print(f"Error in background task: {e}")
 
-    # 3. Format and send the SMS back via Twilio
-    twiml = MessagingResponse()
-    twiml.message(reply_text)
-    return str(twiml)
+@app.route("/sms", methods=['POST'])
+def reply_to_sms():
+    user_message = request.form.get('Body')
+    from_number = request.form.get('From')
+
+    # Start the background 'brain' so we can finish this request immediately
+    thread = threading.Thread(target=ask_gemini_and_send_sms, args=(user_message, from_number))
+    thread.start()
+
+    # Tell Twilio "I've got it!" so it stops the 15-second timer
+    return "OK", 200
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
