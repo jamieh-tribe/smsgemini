@@ -72,5 +72,8 @@ def reply_to_sms():
     return str(twiml)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    # Render provides the port in the environment; 
+    # we use 5000 as a fallback only for local testing.
+    port = int(os.environ.get("PORT", 5000))
+    # host MUST be 0.0.0.0 to be visible to Render's network
     app.run(host='0.0.0.0', port=port)
