@@ -62,5 +62,7 @@ def reply_to_sms():
     return str(twiml)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    # Render provides the port; we must use it or the health check fails
+    port = int(os.environ.get("PORT", 10000))
+    # host MUST be 0.0.0.0 for Render's network to see it
     app.run(host='0.0.0.0', port=port)
