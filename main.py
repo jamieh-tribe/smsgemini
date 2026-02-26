@@ -68,10 +68,9 @@ def reply_to_sms():
             contents=f"History:\n{history_context}\n{calendar_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())],
-            max_output_tokens=100,  # Limits the response to ~400 characters max
+            max_output_tokens=200,  # Limits the response 1 token = 4 characters
             system_instruction=(
                 "You are a warm, friendly assistant. Use Celsius/metric. "
-                "IMPORTANT: Keep your responses brief and under 300 characters total. "
                 "Only greet by name occasionally. Vary your greetings. "
                 "Prioritize weather from bom.gov.au and surf from Surfline/Swellnet."
                     "If calendar information is provided in the prompt, use it to answer questions about the user's schedule."
