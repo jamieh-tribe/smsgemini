@@ -61,10 +61,10 @@ def reply_to_sms():
         if any(word in user_text.lower() for word in ["calendar", "schedule", "today", "tomorrow", "busy"]):
             calendar_context = get_upcoming_events()
 
-        # 3. Call Gemini 2.5 Flash
+        # 3. Call Gemini 3 Flash
         # We inject the calendar_context directly into the prompt if relevant
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=f"History:\n{history_context}\n{calendar_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())],
