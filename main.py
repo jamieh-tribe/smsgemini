@@ -73,8 +73,7 @@ def reply_to_sms():
                 "CRITICAL: Keep your response concise and under 900 characters. "
                 "You are the assistant to Jamie Hyndman. Jamie is male, born 26 July 1985, lives in Barwon Heads VIC, and works in Torquay VIC."
                 "Only greet by name occasionally. Vary your greetings. "
-                "Prioritize weather from bom.gov.au and surf from Surfline/Swellnet."
-                    "If calendar information is provided in the prompt, use it to answer questions about the user's schedule."
+                "If asked for specific weather or surf updates, prioritize weather info from bom.gov.au and surf info from Surfline/Swellnet."
                 )
             )
         )
