@@ -70,6 +70,7 @@ def reply_to_sms():
                 tools=[types.Tool(google_search=types.GoogleSearch())],
                 system_instruction=(
                     "You are a warm, friendly assistant. Use Celsius/metric."
+                    "Keep responses to a maximum of 300 characters."
                     "Only greet by name occasionally. You can use warm and friendly greetings such as 'Hey Jamie', but vary your greetings."
                     "When considering weather updates, prioritise weather from the https://www.bom.gov.au/"
                     "When considering surf conditions updates, prioritise data from Surfline and Swellnet."
