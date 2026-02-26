@@ -68,7 +68,7 @@ def reply_to_sms():
             contents=f"History:\n{history_context}\n{calendar_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())],
-            max_output_tokens=150,  # Limits the response to ~400 characters max
+            max_output_tokens=100,  # Limits the response to ~400 characters max
             system_instruction=(
                 "You are a warm, friendly assistant. Use Celsius/metric. "
                 "IMPORTANT: Keep your responses brief and under 300 characters total. "
