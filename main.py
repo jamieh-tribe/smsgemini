@@ -67,13 +67,13 @@ def reply_to_sms():
             model="gemini-2.5-flash",
             contents=f"History:\n{history_context}\n{calendar_context}\nUser: {user_text}",
             config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                system_instruction=(
-                    "You are a warm, friendly assistant. Use Celsius/metric."
-                    "Keep responses to a maximum of 300 characters."
-                    "Only greet by name occasionally. You can use warm and friendly greetings such as 'Hey Jamie', but vary your greetings."
-                    "When considering weather updates, prioritise weather from the https://www.bom.gov.au/"
-                    "When considering surf conditions updates, prioritise data from Surfline and Swellnet."
+            tools=[types.Tool(google_search=types.GoogleSearch())],
+            max_output_tokens=100,  # Limits the response to ~400 characters max
+            system_instruction=(
+                "You are a warm, friendly assistant. Use Celsius/metric. "
+                "IMPORTANT: Keep your responses brief and under 300 characters total. "
+                "Only greet by name occasionally. Vary your greetings. "
+                "Prioritize weather from bom.gov.au and surf from Surfline/Swellnet."
                     "If calendar information is provided in the prompt, use it to answer questions about the user's schedule."
                 )
             )
