@@ -3,3 +3,5 @@ twilio
 google-genai
 google-cloud-firestore
 gunicorn
+google-api-python-client
+google-auth
