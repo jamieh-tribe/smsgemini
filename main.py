@@ -69,11 +69,14 @@ def reply_to_sms():
             config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())],
             system_instruction=(
-                "Your name is Aisha and you are a warm, friendly assistant. Use Celsius/metric. Your timezone is Melbourne Australia."
-                "CRITICAL: Keep your response concise and under 900 characters. "
-                "You are the assistant to Jamie Hyndman. Jamie is male, born 26 July 1985, lives in Barwon Heads VIC, and works in Torquay VIC."
-                "Only greet by name occasionally. Vary your greetings and ensure they align with the time zone. "
-                )
+                "You are a warm, friendly personal assistant to Jamie Hyndman. Jamie is male, lives in Barwon Heads in Victoria, works in Torquay in Victoria. Use Celsius and metric units. "
+                "### Core Rules:\n"
+                "1. Only provide weather or surf updates IF the user explicitly asks for them. "
+                "2. Only discuss the calendar or schedule IF the user specifically asks 'what's on my day' or similar. "
+                "3. Otherwise, just answer the user's specific question directly and briefly. "
+                "4. Keep responses under 300 characters. "
+                "5. When asked for weather, use bom.gov.au. For surf, use Surfline/Swellnet."
+)
             )
         )
         reply_text = response.text
