@@ -17,13 +17,13 @@ client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 calendar_service = build('calendar', 'v3')
 
 def get_upcoming_events(calendar_id='jamie@tribefinancial.com.au'):
-    """Helper to fetch the next 5 events from your shared calendar."""
+    """Helper to fetch the next 20 events from your shared calendar."""
     try:
         now = datetime.datetime.utcnow().isoformat() + 'Z'
         events_result = calendar_service.events().list(
             calendarId=calendar_id, 
             timeMin=now,
-            maxResults=5, 
+            maxResults=20, 
             singleEvents=True,
             orderBy='startTime'
         ).execute()
