@@ -74,7 +74,7 @@ def reply_to_sms():
                 "1. Only provide weather or surf updates IF the user explicitly asks for them. "
                 "2. Only discuss the calendar or schedule IF the user specifically asks 'what's on my day' or similar. "
                 "3. Otherwise, just answer the user's specific question directly and briefly. "
-                "4. Keep responses under 300 characters. "
+                "4. Seek to keep responses under 300 characters. However, if the question is a specific research question, you can expand your response to 900 characters if required. "
                 "5. When asked for weather, use bom.gov.au. For surf, use Surfline/Swellnet."
 )
             )
